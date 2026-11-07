@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Эра Нейросетей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 25px;
+            background: #21262d;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .stats-panel {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+
+        .mps-display {
+            font-size: 14px;
+            color: #388bfd;
+        }
+
+        .click-area {
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .click-btn {
+            background: radial-gradient(circle, #1f6feb 0%, #0d44a0 100%);
+            border: 4px solid #58a6ff;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+            transition: transform 0.05s, box-shadow 0.2s;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-size: 40px;
+        }
+
+        .click-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+        }
+
+        .shop-panel {
+            text-align: left;
+        }
+
+        .shop-title {
+            font-size: 18px;
+            color: #c9d1d9;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+        }
+
+        .item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .item.disabled {
+            opacity: 0.5;
+        }
+
+        .item-info h3 {
+            font-size: 15px;
+            color: #f0f6fc;
+            margin-bottom: 2px;
+        }
+
+        .item-info p {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .buy-btn {
+            background: #238636;
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            background: #2ea043;
+        }
+
+        .buy-btn:disabled {
+            background: #30363d;
+            color: #8b949e;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Эра Нейросетей</h1>
+    <div class="status" id="player-status">Звание: Случайный прохожий 👁️</div>
+
+    <div class="stats-panel">
+        <div class="score-display" id="score">0</div>
+        <div class="mps-display" id="mps">Авто-прирост: +0 в сек.</div>
+    </div>
+
+    <div class="click-area">
+        <button class="click-btn" id="click-me">🤖</button>
+    </div>
+
+    <div class="shop-panel">
+        <div class="shop-title">Магазин ИИ-Апгрейдов</div>
+        
+        <!-- Апгрейд 1 -->
+        <div class="item" id="item1-container">
+            <div class="item-info">
+                <h3>Книжка по промптам 📘</h3>
+                <p>Прирост: +0.5/сек | Всего: <span id="count1">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy1">Купить: 15 б.</button>
+        </div>
+
+        <!-- Апгрейд 2 -->
+        <div class="item" id="item2-container">
+            <div class="item-info">
+                <h3>ИИ-Ассистент (Claude) 💬</h3>
+                <p>Прирост: +4/сек | Всего: <span id="count2">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy2">Купить: 100 б.</button>
+        </div>
+
+        <!-- Апгрейд 3 -->
+        <div class="item" id="item3-container">
+            <div class="item-info">
+                <h3>Курсы по Вайбкодингу 🎓</h3>
+                <p>Прирост: +30/сек | Всего: <span id="count3">0</span></p>
+            </div>
+            <button class="buy-btn" id="buy3">Купить: 1200 б.</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Переменные состояния игры
+    let score = 0;
+    let totalMps = 0;
+
+    // Данные апгрейдов [Цена, Прирост в секунду, Количество]
+    let upgrades = {
+        item1: { price: 15, mps: 0.5, count: 0 },
+        item2: { price: 100, mps: 4, count: 0 },
+        item3: { price: 1200, mps: 30, count: 0 }
+    };
+
+    // Элементы страницы
+    const scoreEl = document.getElementById('score');
+    const mpsEl = document.getElementById('mps');
+    const statusEl = document.getElementById('player-status');
+    const clickBtn = document.getElementById('click-me');
+
+    // Клик по главной кнопке
+    clickBtn.addEventListener('click', () => {
+        score += 1;
+        updateUI();
+    });
+
+    // Покупка Апгрейда 1
+    document.getElementById('buy1').addEventListener('click', () => buyUpgrade('item1', 'count1', 'buy1'));
+    // Покупка Апгрейда 2
+    document.getElementById('buy2').addEventListener('click', () => buyUpgrade('item2', 'count2', 'buy2'));
+    // Покупка Апгрейда 3
+    document.getElementById('buy3').addEventListener('click', () => buyUpgrade('item3', 'count3', 'buy3'));
+
+    // Функция покупки
+    function buyUpgrade(itemId, countId, btnId) {
+        let up = upgrades[itemId];
+        if (score >= up.price) {
+            score -= up.price;
+            up.count++;
+            // Увеличиваем цену на 15% для усложнения
+            up.price = Math.round(up.price * 1.15);
+            
+            // Обновляем текст
+            document.getElementById(countId).innerText = up.count;
+            document.getElementById(btnId).innerText = `Купить: ${up.price} б.`;
+            
+            // Пересчитываем общий доход в секунду
+            calculateMps();
+            updateUI();
+        }
+    }
+
+    // Расчет дохода в секунду
+    function calculateMps() {
+        totalMps = (upgrades.item1.count * upgrades.item1.mps) + 
+                   (upgrades.item2.count * upgrades.item2.mps) + 
+                   (upgrades.item3.count * upgrades.item3.mps);
+        mpsEl.innerText = `Авто-прирост: +${totalMps.toFixed(1)} в сек.`;
+    }
+
+    // Обновление интерфейса и званий
+    function updateUI() {
+        // Округляем отображение баллов до целого для красоты
+        scoreEl.innerText = Math.floor(score);
+
+        // Обновление званий
+        if (score < 100) {
+            statusEl.innerText = "Звание: Случайный прохожий 👁️";
+        } else if (score >= 100 && score < 1000) {
+            statusEl.innerText = "Звание: Студент ИИ-курсов 🎓";
+        } else if (score >= 1000 && score < 10000) {
+            statusEl.innerText = "Звание: Промпт-Инженер 🧠";
+        } else {
+            statusEl.innerText = "Звание: Вайбкодер-Профессионал 🚀";
+        }
+
+        // Проверка доступности кнопок в магазине
+        toggleButton('buy1', upgrades.item1.price, 'item1-container');
+        toggleButton('buy2', upgrades.item2.price, 'item2-container');
+        toggleButton('buy3', upgrades.item3.price, 'item3-container');
+    }
+
+    // Включение/выключение кнопок в зависимости от баланса
+    function toggleButton(btnId, price, containerId) {
+        const btn = document.getElementById(btnId);
+        const container = document.getElementById(containerId);
+        if (score >= price) {
+            btn.disabled = false;
+            container.classList.remove('disabled');
+        } else {
+            btn.disabled = true;
+            container.classList.add('disabled');
+        }
+    }
+
+    // Таймер: начисление баллов каждую секунду (работает в фоновом режиме)
+    setInterval(() => {
+        if (totalMps > 0) {
+            score += totalMps / 10; // делим на 10, так как проверяем каждые 100мс для плавности
+            updateUI();
+        }
+    }, 100);
+
+    // Первичный запуск
+    updateUI();
+</script>
+
+</body>
+</html>
